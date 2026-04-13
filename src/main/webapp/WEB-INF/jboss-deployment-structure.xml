@@ -1,0 +1,12 @@
+<jboss-deployment-structure>
+    <deployment>
+        <exclude-subsystems>
+            <subsystem name="logging"/>
+            <subsystem name="jpa"/>
+            <subsystem name="datasources"/>
+        </exclude-subsystems>
+        <exclusions>
+            <module name="org.hibernate.validator"/>
+        </exclusions>
+    </deployment>
+</jboss-deployment-structure>
