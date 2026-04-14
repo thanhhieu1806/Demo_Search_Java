@@ -28,19 +28,18 @@ public class TmsraController {
         this.tmsraService = tmsraService;
     }
 
-    /**
-     * Đăng nhập TMSRA → trả về accessToken.
-     */
+
     @PostMapping("/login")
     public Map<String, Object> loginAndGetAccessToken(
             @RequestBody(required = false) AuthRequest request) {
-        if (request == null || request.normalizedUsername() == null
-                || request.password() == null || request.password().isBlank()) {
+        if (request == null
+                || request.normalizedUsername() == null
+                || request.password() == null
+                || request.password().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thiếu username hoặc password");
         }
         return tmsraService.getAccessTokenInfo(request.normalizedUsername(), request.password());
     }
-
 
     @PostMapping({"/search-certificate", "/search"})
     public Map<String, Object> searchCertificateInfo(
@@ -49,12 +48,12 @@ public class TmsraController {
 
         TmsraSearchRequest safeRequest = (request != null) ? request : TmsraSearchRequest.empty();
 
-        // Lấy accessToken từ header Authorization của client gửi lên
-        String accessToken = httpRequest.getHeader("Authorization");
-        // Nếu header trống thì để null, service sẽ tự lấy
-        if (accessToken != null && accessToken.isBlank()) {
-            accessToken = null;
-        }
+        // Lấy accessToken từ header Authorization do client gửi lên
+        String authHeader = httpRequest.getHeader("Authorization");
+        // Normalize: nếu rỗng/blank thì truyền null để service tự lấy
+        String accessToken = (authHeader != null && !authHeader.isBlank()) ? authHeader.trim() : null;
+
+        log.info("TMSRA search-certificate — accessToken present: {}", accessToken != null);
 
         try {
             return tmsraService.searchCertificateInfo(safeRequest, accessToken);
@@ -63,12 +62,13 @@ public class TmsraController {
             throw ex;
         } catch (Exception ex) {
             log.error("Unexpected error while searching TMSRA certificates", ex);
-            throw ex;
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Lỗi không xác định khi tìm kiếm chứng thư");
         }
     }
 
     /**
-     * Lấy danh sách trạng thái chứng thư.
+     * Lấy danh sách trạng thái chứng thư (dùng để hiển thị filter).
      */
     @GetMapping("/states")
     public Map<String, Object> getCertificateStates(

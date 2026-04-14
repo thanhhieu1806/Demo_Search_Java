@@ -74,18 +74,8 @@ public class TmsraService {
         }
     }
 
-    // ─── Tìm kiếm chứng thư: getCertificateInfoForTMSRA ────────────────────────
+    // ─── Tìm kiếm chứng thư: getCertificateInfoForTMSRA
 
-    /**
-     * Gọi API getCertificateInfoForTMSRA.
-     *
-     * Header yêu cầu:
-     *   userName: <tên đăng nhập TMSRA>
-     *   Authorization: <accessToken>
-     *   Content-Type: application/json
-     *
-     * Body: các tiêu chí tìm kiếm (taxCode, pid, citizenId, ...)
-     */
     public Map<String, Object> searchCertificateInfo(
             com.example.demo.dto.TmsraSearchRequest request,
             String accessToken) {
@@ -144,8 +134,7 @@ public class TmsraService {
         }
     }
 
-    // ─── Danh sách trạng thái chứng thư ────────────────────────────────────────
-
+    // Danh sách trạng thái chứng thư
     public Map<String, Object> getCertificateStates(String language, String certificateStateCode) {
         String url = props.getBaseUrl() + "/getCertificateState";
 
@@ -170,7 +159,6 @@ public class TmsraService {
         }
     }
 
-    // ─── HTTP helper ────────────────────────────────────────────────────────────
 
     /**
      * @param userName    Nếu khác null → thêm header "userName"
@@ -206,7 +194,7 @@ public class TmsraService {
 
         if (is == null) {
             throw new ResponseStatusException(HttpStatus.valueOf(status),
-                    "TMSRA trả về HTTP " + status + " không có body");
+                    "TMSRA trả về HTTP" + status + "không có body");
         }
 
         String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
@@ -214,7 +202,7 @@ public class TmsraService {
 
         if (status < 200 || status >= 300) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "TMSRA HTTP " + status + ": " + body);
+                    "TMSRA HTTP" + status + ": " + body);
         }
         return body;
     }
@@ -224,8 +212,6 @@ public class TmsraService {
             map.put(key, value);
         }
     }
-
-    // ─── SSL bypass (dev/staging với cert tự ký) ────────────────────────────────
 
     private static void disableSslVerification() {
         try {
